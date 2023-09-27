@@ -1,6 +1,13 @@
 import ListTodos, { TodoList } from "./components/ListTodos";
-import { Box, Typography, TextField, Button } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  ToggleButtonGroup,
+  ToggleButton,
+} from "@mui/material";
+import { useState, useEffect } from "react";
 
 const listTodos: TodoList = [
   { id: 1, text: "Тестовое задание", status: false },
@@ -11,13 +18,42 @@ const listTodos: TodoList = [
 function App() {
   const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState(listTodos);
+  const [alignment, setAlignment] = useState("all");
+  const [filtred, setFiltred] = useState(todos);
+
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string
+  ) => {
+    if (newAlignment !== null) {
+      setAlignment(newAlignment);
+      todoFilter(newAlignment);
+    }
+  };
+
+  const todoFilter = (alignment: string) => {
+    switch (alignment) {
+      case "active": {
+        setFiltred(todos.filter((todo) => !todo.status));
+        break;
+      }
+      case "completed": {
+        setFiltred(todos.filter((todo) => todo.status));
+        break;
+      }
+      default: {
+        setFiltred(todos);
+        break;
+      }
+    }
+  };
 
   const addTodo = () => {
     if (inputValue) {
       setTodos([
         ...todos,
         {
-          id: listTodos.length + 1,
+          id: Date.now(),
           text: inputValue,
           status: false,
         },
@@ -41,6 +77,7 @@ function App() {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
+  useEffect(() => todoFilter(alignment), [todos]);
   return (
     <Box
       sx={{
@@ -62,7 +99,22 @@ function App() {
           Добавить
         </Button>
       </Box>
-      <ListTodos list={todos} removeTodo={removeTodo} toggleTodo={toogleTodo} />
+      <ListTodos
+        list={filtred}
+        removeTodo={removeTodo}
+        toggleTodo={toogleTodo}
+      />
+      <ToggleButtonGroup
+        color="primary"
+        value={alignment}
+        exclusive
+        onChange={handleChange}
+        aria-label="Platform"
+      >
+        <ToggleButton value="all">Все</ToggleButton>
+        <ToggleButton value="active">Активные</ToggleButton>
+        <ToggleButton value="completed">Завершенные</ToggleButton>
+      </ToggleButtonGroup>
     </Box>
   );
 }
