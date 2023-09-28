@@ -23,7 +23,7 @@ function App() {
   const [filtred, setFiltred] = useState(todos);
 
   const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
+    _event: React.MouseEvent<HTMLElement>,
     newAlignment: string
   ) => {
     if (newAlignment !== null) {
